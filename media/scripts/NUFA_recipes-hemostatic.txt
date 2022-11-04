@@ -1,0 +1,18 @@
+module NUFA
+{
+    imports {
+        Base
+    }
+
+    recipe Create hemostatic powder {
+
+		keep Bandage,
+
+        Result           		: Hemostatic_powder=1,
+        Time                    : 60.0,
+        Category                : Health
+		CanBeDoneFromFloor      : TRUE,
+		NeedToBeLearn           : false,
+    }
+
+}

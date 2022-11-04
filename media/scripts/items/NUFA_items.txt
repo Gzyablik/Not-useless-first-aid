@@ -1,0 +1,14 @@
+module NUFA {
+    imports {
+        Base
+    }
+
+    item Hemostatic_powder {
+        Weight = 0.1,
+        Type = Normal,
+        DisplayName = Hemostatic powder,
+        Medical = TRUE,
+        DisplayCategory = FirstAid,
+        Icon = HemoPowder
+    }
+}
