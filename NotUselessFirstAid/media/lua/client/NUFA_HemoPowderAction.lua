@@ -1,12 +1,18 @@
 require 'TimedActions/ISBaseTimedAction'
 
+HemoPowderAction = {}
 HemoPowderAction = ISBaseTimedAction:derive('HemoPowderAction')
 
 function HemoPowderAction:isValid()
-    if ISHealthPanel.DidPatientMove(self.character, self.otherPlayer, self.patientPositionX, self.patientPositionY) then
+    if ISHealthPanel.DidPatientMove(self.character, self.otherPlayer, self.bandagedPlayerX, self.bandagedPlayerY) then
         return false
     end
-    return self.character:getInventory():contains(self.item)
+    if self.item then
+        return self.character:getInventory():contains(self.item);
+    else
+        if not self.bodyPart:bandaged() then return false end
+        return true
+    end
 end
 
 function HemoPowderAction:waitToStart()
@@ -21,41 +27,39 @@ function HemoPowderAction:update()
     if self.character ~= self.otherPlayer then
         self.character:faceThisObject(self.otherPlayer)
     end
-    self.item:setJobDelta(self:getJobDelta())
+    if self.item then
+        self.item:setJobDelta(self:getJobDelta());
+    end
     ISHealthPanel.setBodyPartActionForPlayer(self.otherPlayer, self.bodyPart, self, "Apply hemostatic powder", nil)
 end
 
 function HemoPowderAction:start()
-    self.item:setJobType("Apply hemostatic powder");
-    self.item:setJobDelta(0.0);
     if self.character == self.otherPlayer then
         self:setActionAnim(CharacterActionAnims.Bandage);
         self:setAnimVariable("BandageType", ISHealthPanel.getBandageType(self.bodyPart));
-        self.character:reportEvent("EventBandage");
     else
         self:setActionAnim('Loot')
         self.character:SetVariable('LootPosition', 'Mid')
-        self.character:reportEvent("EventLootItem")
     end
-
-    self:setOverrideHandModels(self.item, nil)
+    self:setOverrideHandModels(nil, nil)
 end
 
 function HemoPowderAction:stop()
-    self.item:setJobDelta(0.0)
     ISHealthPanel.setBodyPartActionForPlayer(self.otherPlayer, self.bodyPart, nil, nil, nil)
     ISBaseTimedAction.stop(self)
+    if self.item then
+        self.item:setJobDelta(0.0);
+    end
 end
 
 function HemoPowderAction:perform()
     ISBaseTimedAction.perform(self);
-    self.item:setJobDelta(0.0);
-    if self.character:HasTrait("Hemophobic") and self.bodyPart:getBleedingTime() > 0 then
-        self.character:getStats():setPanic(self.character:getStats():getPanic() + 50);
+    if self.item then
+        self.item:setJobDelta(0.0);
+        self.character:getInventory():Remove(self.item);
     end
-    self.character:getInventory():Remove(self.item);
-    Survivor:getBodyPartByType(bodyPart):setBleeding(false)
-    Survivor:getBodyPartByType(bodyPart):setBleedingTime(0)
+    self.bodyPart:setBleeding(false)
+    self.bodyPart:setBleedingTime(0)
     ISHealthPanel.setBodyPartActionForPlayer(self.otherPlayer, self.bodyPart, nil, nil, nil)
 end
 

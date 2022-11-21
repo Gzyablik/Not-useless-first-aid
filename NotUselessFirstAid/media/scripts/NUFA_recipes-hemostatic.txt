@@ -6,11 +6,14 @@ module NUFA
 
     recipe Create hemostatic powder {
 
-		keep Bandage,
+        keep [Recipe.GetItemTypes.MortarPestle],
+        Plantain=5,
+		PillsVitamins=5,
 
         Result           		: Hemostatic_powder=1,
-        Time                    : 60.0,
-        Category                : Health
+        Time                    : 500.0,
+        Category                : Health,
+        SkillRequired 		    : Doctor=3,
 		CanBeDoneFromFloor      : TRUE,
 		NeedToBeLearn           : false,
     }
